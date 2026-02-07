@@ -15,8 +15,8 @@ Beautiful Mermaid rendering plugin for Obsidian using [lukilabs/beautiful-mermai
 ### From Source
 
 1. Clone this repository
-2. Run `npm install`
-3. Run `npm run build`
+2. Run `bun install`
+3. Run `bun run build`
 4. Copy the built files to your Obsidian vault's plugins directory:
    ```
    mkdir -p ~/.obsidian/plugins/beautiful-mermaid
@@ -70,16 +70,39 @@ The plugin will automatically render it with the selected theme.
 
 ## Development
 
+This project uses [Bun](https://bun.sh/) as the package manager and build tool.
+
 ```bash
 # Install dependencies
-npm install
+bun install
 
-# Build for development
-npm run dev
+# Build for development (watch mode)
+bun run dev
 
 # Build for production
-npm run build
+bun run build
+
+# Type check
+bun run type-check
 ```
+
+## Releasing
+
+This project uses GitHub Actions to automatically build and create releases when pushing version tags.
+
+```bash
+# Update version (creates a git commit + tag)
+bun pm version patch  # or minor/major
+
+# Push commit and tag (triggers GitHub Actions)
+git push origin main --follow-tags
+```
+
+The workflow will:
+1. Build the plugin using Bun
+2. Generate `main.js` and `versions.json`
+3. Create a GitHub Release with a ZIP package
+4. Upload all necessary files
 
 ## Dependencies
 
@@ -101,4 +124,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-If you encounter any issues, please report them on the [GitHub Issues](https://github.com/yourusername/beautiful-mermaid-obsidian/issues) page.
+If you encounter any issues, please report them on the [GitHub Issues](https://github.com/chinaphp/beautiful-mermaid-obsidian/issues) page.

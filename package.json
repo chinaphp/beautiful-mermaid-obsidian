@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "Beautiful Mermaid rendering plugin for Obsidian using lukilabs/beautiful-mermaid",
   "main": "main.js",
-  "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "node esbuild.config.mjs",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-    "dev:bun": "bun run esbuild.config.mjs",
-    "build:bun": "bun run esbuild.config.mjs production",
+    "dev": "bun run esbuild.config.mjs",
+    "build": "bun run esbuild.config.mjs production",
+    "type-check": "tsc -noEmit -skipLibCheck",
+    "release": "npm run build && node -e \"const fs = require('fs'); const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); const v = pkg.version; fs.writeFileSync('versions.json', JSON.stringify({[v]: 'See release notes on GitHub for changes'}, null, 2));\"",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [
@@ -18,7 +17,7 @@
     "diagram",
     "visualization"
   ],
-  "author": "Your Name",
+  "author": "Coffee",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^16.11.6",

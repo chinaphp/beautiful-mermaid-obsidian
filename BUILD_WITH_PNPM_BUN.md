@@ -1,93 +1,43 @@
-# 🚀 使用 pnpm 或 Bun 构建 Beautiful Mermaid 插件
+# 🚀 使用 Bun 构建 Beautiful Mermaid 插件
+
+本项目使用 [Bun](https://bun.sh/) 作为包管理器和构建工具，提供极快的安装和构建速度。
 
 ## 📦 安装依赖
-
-### 使用 pnpm（推荐 - 最快）
-
-```bash
-cd beautiful-mermaid-obsidian
-pnpm install
-```
-
-### 使用 Bun（最快的运行时）
 
 ```bash
 cd beautiful-mermaid-obsidian
 bun install
-```
-
-### 使用 npm（传统）
-
-```bash
-cd beautiful-mermaid-obsidian
-npm install
 ```
 
 ---
 
 ## 🔨 构建插件
 
-### 使用 pnpm
-
 ```bash
 # 开发模式（监听文件变化）
-pnpm run dev
+bun run dev
 
 # 生产构建
-pnpm run build
-```
+bun run build
 
-### 使用 Bun
-
-```bash
-# 开发模式
-pnpm run dev:bun
-
-# 生产构建
-pnpm run build:bun
-```
-
-### 使用 npm
-
-```bash
-# 开发模式
-npm run dev
-
-# 生产构建
-npm run build
+# 类型检查
+bun run type-check
 ```
 
 ---
 
-## ⚡ 性能对比
+## ⚡ 为什么使用 Bun？
 
-| 包管理器 | 安装速度 | 构建速度 | 优势 |
-|---------|---------|---------|------|
-| **Bun** | ⚡⚡⚡ | ⚡⚡⚡ | 最快，零配置 |
-| **pnpm** | ⚡⚡ | ⚡⚡ | 节省磁盘空间，严格依赖 |
-| **npm** | ⚡ | ⚡ | 最通用，默认支持 |
+| 特性 | 说明 |
+|------|------|
+| **极快速度** | 比 npm 快 20 倍，比 pnpm 快 4 倍 |
+| **内置工具** | 不需要安装额外包管理器 |
+| **兼容性好** | Drop-in 替代 Node.js |
+| **零配置** | 开箱即用 |
 
 ---
 
 ## 📋 完整构建流程
-
-### 使用 pnpm
-
-```bash
-# 1. 进入项目目录
-cd beautiful-mermaid-obsidian
-
-# 2. 安装依赖
-pnpm install
-
-# 3. 构建插件
-pnpm run build
-
-# 4. 查看生成的文件
-ls -lh main.js manifest.json
-```
-
-### 使用 Bun
 
 ```bash
 # 1. 进入项目目录
@@ -97,7 +47,7 @@ cd beautiful-mermaid-obsidian
 bun install
 
 # 3. 构建插件
-bun run build:bun
+bun run build
 
 # 4. 查看生成的文件
 ls -lh main.js manifest.json
@@ -107,97 +57,38 @@ ls -lh main.js manifest.json
 
 ## 🛠️ 开发模式
 
-### pnpm 开发模式
-
 ```bash
-pnpm run dev
+bun run dev
 ```
 
 监听文件变化，自动重新构建。只需重载 Obsidian 即可看到更改。
 
-### Bun 开发模式
-
-```bash
-bun run dev:bun
-```
-
-Bun 的开发模式启动更快，适合频繁修改代码。
-
 ---
 
-## 📊 为什么使用 pnpm 或 Bun？
+## 🔄 从其他包管理器迁移
 
-### pnpm 优势
-
-- ✅ **快速** - 比 npm 快 2 倍
-- ✅ **节省空间** - 使用硬链接，节省 50% 磁盘空间
-- ✅ **严格依赖** - 避免幽灵依赖问题
-- ✅ **Monorepo 支持** - 适合大型项目
-
-### Bun 优势
-
-- ✅ **极快** - 比 npm 快 20 倍，比 pnpm 快 4 倍
-- ✅ **内置工具** - 不需要安装额外包管理器
-- ✅ **兼容性好** - Drop-in 替代 Node.js
-- ✅ **零配置** - 开箱即用
-
----
-
-## 🔄 从 npm 迁移
-
-### 如果已经有 node_modules
+### 如果已经有 node_modules（npm/pnpm）
 
 ```bash
 # 清理旧的依赖
-rm -rf node_modules package-lock.json
+rm -rf node_modules package-lock.json pnpm-lock.yaml
 
-# 使用 pnpm 重新安装
-pnpm install
-
-# 或使用 Bun
+# 使用 Bun 重新安装
 bun install
 ```
 
-### 如果已经有 pnpm-lock.yaml
-
-可以直接使用 Bun：
-
-```bash
-bun install
-```
-
-Bun 会自动识别 pnpm-lock.yaml。
-
----
-
-## 🎯 推荐使用场景
-
-### 使用 pnpm 如果：
-
-- 🏢 团队项目，需要统一依赖管理
-- 📦 多包仓库（Monorepo）
-- 💻 需要与现有 CI/CD 管道兼容
-- 🎯 追求构建速度和磁盘空间平衡
-
-### 使用 Bun 如果：
-
-- ⚡ 需要最快的构建速度
-- 🚀 个人项目或原型开发
-- 🎯 想要零配置体验
-- 💻 本地开发为主
+Bun 会自动识别现有的 lockfile 并安装依赖。
 
 ---
 
 ## 📝 快速开始指南
 
-### 选择 1：pnpm（推荐）
-
 ```bash
-# 安装 pnpm（如果还没安装）
-npm install -g pnpm
+# 安装 Bun（如果还没安装）
+curl -fsSL https://bun.sh/install | bash
 
 # 克隆项目
-git clone <your-repo-url>
+git clone https://github.com/chinaphp/beautiful-mermaid-obsidian.git
 cd beautiful-mermaid-obsidian
 
 # 安装依赖
@@ -217,7 +108,7 @@ pnpm run build
 curl -fsSL https://bun.sh/install | bash
 
 # 克隆项目
-git clone <your-repo-url>
+git clone github.com/chinaphp/beautiful-mermaid-obsidian
 cd beautiful-mermaid-obsidian
 
 # 安装依赖

@@ -155,8 +155,8 @@ mindmap
 # 清理并重新安装
 cd beautiful-mermaid-obsidian
 rm -rf node_modules
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ## 🚀 开发模式
@@ -166,7 +166,7 @@ npm run build
 ### 1. 监听文件变化
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 这将自动重新构建代码，你只需重载 Obsidian 即可看到更改。
@@ -236,25 +236,6 @@ npm run build
 - ✅ User Journey (用户旅程)
 - ✅ Git Graph (Git 图)
 
-## 🎯 与云原生 CI/CD 演讲文档配合使用
-
-你的 `云原生CI_CCD演讲.md` 已转换为 Mermaid 格式，现在可以：
-
-1. **在 Obsidian 中预览**
-   - 启用 Beautiful Mermaid 插件
-   - 打开文档
-   - 享受美观的图表
-
-2. **使用 Marp 演示**
-   ```bash
-   marp 云原生CI_CCD演讲.md --server
-   ```
-
-3. **导出为 PDF/PPTX**
-   ```bash
-   marp 云原生CI_CCD演讲.md --pdf
-   marp 云原生CI_CCD演讲.md --pptx
-   ```
 
 ## 🤝 贡献
 

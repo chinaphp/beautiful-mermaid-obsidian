@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "minAppVersion": "0.15.0",
   "description": "Beautiful Mermaid diagrams in Obsidian using lukilabs/beautiful-mermaid with 15+ built-in themes and enhanced aesthetics",
-  "author": "Your Name",
-  "authorUrl": "https://github.com/yourusername",
+  "author": "Coffee",
+  "authorUrl": "https://github.com/chinaphp",
   "isDesktopOnly": false
 }
