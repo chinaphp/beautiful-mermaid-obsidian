@@ -3,7 +3,7 @@
   "name": "Beautiful Mermaid",
   "version": "1.0.2",
   "minAppVersion": "0.15.0",
-  "description": "Beautiful Mermaid diagrams with 15+ built-in themes and enhanced aesthetics.",
+  "description": "Beautiful Mermaid diagrams using lukilabs/beautiful-mermaid with 15+ built-in themes and enhanced aesthetics.",
   "author": "Coffee",
   "authorUrl": "https://github.com/chinaphp",
   "isDesktopOnly": false
