@@ -1,6 +1,6 @@
 {
   "name": "beautiful-mermaid-obsidian",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Beautiful Mermaid rendering plugin for Obsidian using lukilabs/beautiful-mermaid",
   "main": "main.js",
   "scripts": {
