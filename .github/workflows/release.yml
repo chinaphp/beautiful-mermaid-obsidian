@@ -3,7 +3,7 @@ name: Release Plugin
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '*.*.*'
 
 permissions:
   contents: write
@@ -27,15 +27,10 @@ jobs:
       - name: Build plugin
         run: bun run esbuild.config.mjs production
       
-      - name: Generate versions.json
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo '{"'${VERSION}'": "See release notes on GitHub for changes"}' > versions.json
-      
       - name: Create plugin archive
         run: |
           mkdir -p release
-          cp manifest.json main.js versions.json release/
+          cp manifest.json main.js release/
           cd release
           zip -r ../beautiful-mermaid-${{ github.ref_name }}.zip *
           cd ..
@@ -62,7 +57,6 @@ jobs:
             beautiful-mermaid-${{ github.ref_name }}.zip
             manifest.json
             main.js
-            versions.json
           draft: false
           prerelease: false
         env:

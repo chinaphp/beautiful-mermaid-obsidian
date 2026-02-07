@@ -7,7 +7,7 @@
     "dev": "bun run esbuild.config.mjs",
     "build": "bun run esbuild.config.mjs production",
     "type-check": "tsc -noEmit -skipLibCheck",
-    "release": "npm run build && node -e \"const fs = require('fs'); const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); const v = pkg.version; fs.writeFileSync('versions.json', JSON.stringify({[v]: 'See release notes on GitHub for changes'}, null, 2));\"",
+    "release": "bun run build && node version-bump.mjs",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [

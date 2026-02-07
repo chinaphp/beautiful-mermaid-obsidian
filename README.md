@@ -90,11 +90,20 @@ bun run type-check
 
 This project uses GitHub Actions to automatically build and create releases when pushing version tags.
 
-```bash
-# Update version (creates a git commit + tag)
-bun pm version patch  # or minor/major
+Obsidian requires the GitHub release tag to match the `version` in `manifest.json` exactly (no `v` prefix).
 
-# Push commit and tag (triggers GitHub Actions)
+```bash
+# Bump version in package.json (do NOT create a tag)
+bun pm version patch --no-git-tag-version  # or minor/major
+
+# Sync manifest.json and versions.json to match package.json
+node version-bump.mjs
+git add package.json manifest.json versions.json
+git commit -m "Release X.Y.Z"
+
+# Create and push tag (triggers GitHub Actions)
+# IMPORTANT: tag must be exactly X.Y.Z (no "v" prefix)
+git tag X.Y.Z
 git push origin main --follow-tags
 ```
 
