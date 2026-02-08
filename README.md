@@ -20,7 +20,7 @@ Beautiful Mermaid rendering plugin for Obsidian using [lukilabs/beautiful-mermai
 4. Copy the built files to your Obsidian vault's plugins directory:
    ```
    mkdir -p ~/.obsidian/plugins/beautiful-mermaid
-   cp manifest.json main.js ~/.obsidian/plugins/beautiful-mermaid/
+   cp manifest.json main.js styles.css ~/.obsidian/plugins/beautiful-mermaid/
    ```
 5. Enable the plugin in Obsidian settings
 

@@ -14,4 +14,4 @@ const versions = JSON.parse(fs.readFileSync('versions.json', 'utf8'));
 versions[version] = manifest.minAppVersion;
 fs.writeFileSync('versions.json', JSON.stringify(versions, null, 2));
 
-console.log(`Updated to version ${version}`);
+console.debug(`Updated to version ${version}`);

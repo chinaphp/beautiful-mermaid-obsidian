@@ -1,0 +1,28 @@
+.beautiful-mermaid-svg {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.beautiful-mermaid-svg text {
+  fill: var(--fg);
+}
+
+.beautiful-mermaid-svg path,
+.beautiful-mermaid-svg line,
+.beautiful-mermaid-svg rect,
+.beautiful-mermaid-svg circle {
+  stroke: var(--line);
+}
+
+.beautiful-mermaid-svg .node rect {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.beautiful-mermaid-missing {
+  padding: 20px;
+  text-align: center;
+  color: var(--fg);
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}

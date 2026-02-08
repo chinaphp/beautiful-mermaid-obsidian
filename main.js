@@ -30,6 +30,20 @@ module.exports = __toCommonJS(main_exports);
 var import_obsidian = require("obsidian");
 
 // src/renderer.ts
+function clearElement(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+}
+function getGlobalProperty(name) {
+  return window[name];
+}
+function hasFunctionProperty(value, prop) {
+  if (typeof value !== "object" || value === null)
+    return false;
+  const record = value;
+  return typeof record[prop] === "function";
+}
 var THEMES = {
   "tokyo-night": { bg: "#1a1b26", fg: "#a9b1d6", accent: "#7aa2f7" },
   "tokyo-night-storm": { bg: "#24283b", fg: "#a9b1d6", accent: "#7aa2f7" },
@@ -50,16 +64,11 @@ var THEMES = {
 function applyThemeToSvg(svgElement, theme) {
   svgElement.style.setProperty("--bg", theme.bg);
   svgElement.style.setProperty("--fg", theme.fg);
-  if (theme.line)
-    svgElement.style.setProperty("--line", theme.line);
-  if (theme.accent)
-    svgElement.style.setProperty("--accent", theme.accent);
-  if (theme.muted)
-    svgElement.style.setProperty("--muted", theme.muted);
-  if (theme.surface)
-    svgElement.style.setProperty("--surface", theme.surface);
-  if (theme.border)
-    svgElement.style.setProperty("--border", theme.border);
+  svgElement.style.setProperty("--line", theme.line || mixColor(theme.bg, theme.fg, 0.3));
+  svgElement.style.setProperty("--accent", theme.accent || mixColor(theme.bg, theme.fg, 0.5));
+  svgElement.style.setProperty("--muted", theme.muted || mixColor(theme.bg, theme.fg, 0.6));
+  svgElement.style.setProperty("--surface", theme.surface || mixColor(theme.bg, theme.fg, 0.03));
+  svgElement.style.setProperty("--border", theme.border || mixColor(theme.bg, theme.fg, 0.2));
   svgElement.style.backgroundColor = theme.bg;
   const textElements = svgElement.querySelectorAll("text, tspan");
   textElements.forEach((el) => {
@@ -83,61 +92,31 @@ function mixColor(bg, fg, ratio) {
 }
 async function renderBeautifulMermaid(source, container, themeName = "tokyo-night") {
   const theme = THEMES[themeName] || THEMES["tokyo-night"];
-  container.innerHTML = "";
-  if (window.beautifulMermaid) {
+  clearElement(container);
+  const beautifulMermaidCandidate = getGlobalProperty("beautifulMermaid");
+  if (hasFunctionProperty(beautifulMermaidCandidate, "renderMermaid")) {
     try {
-      const beautifulMermaid = window.beautifulMermaid;
+      const beautifulMermaid = beautifulMermaidCandidate;
       const svg = await beautifulMermaid.renderMermaid(source, theme);
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(svg, "image/svg+xml");
-      const rootElement = svgDoc.documentElement;
-      if (rootElement && rootElement.tagName.toLowerCase() === "svg") {
-        const svgElement = rootElement;
-        applyThemeToSvg(svgElement, theme);
-        const style = document.createElement("style");
-        style.textContent = `
-                    .beautiful-mermaid-svg {
-                        --bg: ${theme.bg};
-                        --fg: ${theme.fg};
-                        --line: ${theme.line || mixColor(theme.bg, theme.fg, 0.3)};
-                        --accent: ${theme.accent || mixColor(theme.bg, theme.fg, 0.5)};
-                        --muted: ${theme.muted || mixColor(theme.bg, theme.fg, 0.6)};
-                        --surface: ${theme.surface || mixColor(theme.bg, theme.fg, 0.03)};
-                        --border: ${theme.border || mixColor(theme.bg, theme.fg, 0.2)};
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                    }
-                    .beautiful-mermaid-svg text {
-                        fill: var(--fg);
-                    }
-                    .beautiful-mermaid-svg path,
-                    .beautiful-mermaid-svg line,
-                    .beautiful-mermaid-svg rect,
-                    .beautiful-mermaid-svg circle {
-                        stroke: var(--line);
-                    }
-                    .beautiful-mermaid-svg .node rect {
-                        fill: var(--surface);
-                        stroke: var(--border);
-                    }
-                `;
-        container.appendChild(style);
-        container.appendChild(svgElement);
-        svgElement.classList.add("beautiful-mermaid-svg");
-        return;
-      }
-      throw new Error("Failed to parse SVG from beautiful-mermaid");
+      const svgElement = svgDoc.querySelector("svg");
+      if (!svgElement)
+        throw new Error("Failed to parse SVG from beautiful-mermaid");
+      applyThemeToSvg(svgElement, theme);
+      container.appendChild(svgElement);
+      svgElement.classList.add("beautiful-mermaid-svg");
+      return;
     } catch (error) {
       console.error("Beautiful Mermaid rendering failed:", error);
     }
   }
-  if (window.mermaid) {
+  const mermaidCandidate = getGlobalProperty("mermaid");
+  if (hasFunctionProperty(mermaidCandidate, "initialize") && hasFunctionProperty(mermaidCandidate, "render")) {
     try {
       const cleanSource = source.trim();
-      const id = "mermaid-" + Math.random().toString(36).substr(2, 9);
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = `<pre class="mermaid">${cleanSource}</pre>`;
-      container.appendChild(tempDiv);
-      const mermaid = window.mermaid;
+      const id = "mermaid-" + Math.random().toString(36).slice(2, 11);
+      const mermaid = mermaidCandidate;
       const mermaidTheme = themeName.includes("light") ? "default" : "dark";
       await mermaid.initialize({
         theme: mermaidTheme,
@@ -145,23 +124,31 @@ async function renderBeautifulMermaid(source, container, themeName = "tokyo-nigh
         startOnLoad: false
       });
       const { svg } = await mermaid.render(id, cleanSource);
-      container.innerHTML = svg;
-      const svgElement = container.querySelector("svg");
-      if (svgElement && svgElement.tagName === "svg") {
-        applyThemeToSvg(svgElement, theme);
-        svgElement.classList.add("beautiful-mermaid-svg");
-      }
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(svg, "image/svg+xml");
+      const svgElement = svgDoc.querySelector("svg");
+      if (!svgElement)
+        throw new Error("Failed to parse SVG from mermaid");
+      container.appendChild(svgElement);
+      applyThemeToSvg(svgElement, theme);
+      svgElement.classList.add("beautiful-mermaid-svg");
       return;
     } catch (error) {
       console.error("Mermaid.js fallback failed:", error);
     }
   }
-  container.innerHTML = `
-        <div style="padding: 20px; text-align: center; color: ${theme.fg}; background: ${theme.bg}; border-radius: 8px;">
-            <p>\u26A0\uFE0F Beautiful Mermaid plugin requires mermaid.js to be loaded.</p>
-            <p>Enable Obsidian's built-in Mermaid plugin in settings, or install via CDN.</p>
-        </div>
-    `;
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("beautiful-mermaid-missing");
+  wrapper.style.setProperty("--bg", theme.bg);
+  wrapper.style.setProperty("--fg", theme.fg);
+  wrapper.style.setProperty("--border", theme.border || mixColor(theme.bg, theme.fg, 0.2));
+  const p1 = document.createElement("p");
+  p1.textContent = "Beautiful Mermaid plugin requires Mermaid to be enabled.";
+  const p2 = document.createElement("p");
+  p2.textContent = "Enable Obsidian's built-in Mermaid plugin in settings, or load Mermaid from an online source.";
+  wrapper.appendChild(p1);
+  wrapper.appendChild(p2);
+  container.appendChild(wrapper);
 }
 
 // src/main.ts
@@ -182,14 +169,18 @@ var BeautifulMermaidPlugin = class extends import_obsidian.Plugin {
           await renderBeautifulMermaid(source, el, this.settings.theme);
         } catch (error) {
           console.error("Beautiful Mermaid error:", error);
-          el.innerHTML = `<div class="error">Failed to render Mermaid diagram: ${error}</div>`;
+          const errorDiv = document.createElement("div");
+          errorDiv.classList.add("error");
+          errorDiv.textContent = `Failed to render Mermaid diagram: ${String(error)}`;
+          el.appendChild(errorDiv);
         }
       }
     );
     this.addSettingTab(new BeautifulMermaidSettingTab(this.app, this));
   }
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loaded = await this.loadData();
+    this.settings = { ...DEFAULT_SETTINGS, ...loaded != null ? loaded : {} };
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -203,15 +194,15 @@ var BeautifulMermaidSettingTab = class extends import_obsidian.PluginSettingTab 
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian.Setting(containerEl).setName("Use Default Mermaid").setDesc("Disable Beautiful Mermaid and use Obsidian's built-in Mermaid renderer").addToggle((toggle) => toggle.setValue(this.plugin.settings.useDefaultMermaid).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName("Use default Mermaid").setDesc("Disable beautiful Mermaid and use Obsidian's built-in Mermaid renderer.").addToggle((toggle) => toggle.setValue(this.plugin.settings.useDefaultMermaid).onChange(async (value) => {
       this.plugin.settings.useDefaultMermaid = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("Theme").setDesc("Select a theme for Beautiful Mermaid diagrams").addDropdown((dropdown) => dropdown.addOption("tokyo-night", "Tokyo Night").addOption("tokyo-night-storm", "Tokyo Night Storm").addOption("catppuccin-mocha", "Catppuccin Mocha").addOption("catppuccin-latte", "Catppuccin Latte").addOption("nord", "Nord").addOption("nord-light", "Nord Light").addOption("dracula", "Dracula").addOption("github-dark", "GitHub Dark").addOption("github-light", "GitHub Light").addOption("solarized-dark", "Solarized Dark").addOption("solarized-light", "Solarized Light").addOption("one-dark", "One Dark").addOption("zinc-dark", "Zinc Dark").addOption("zinc-light", "Zinc Light").setValue(this.plugin.settings.theme).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName("Theme").setDesc("Select a theme for beautiful Mermaid diagrams.").addDropdown((dropdown) => dropdown.addOption("tokyo-night", "Tokyo night").addOption("tokyo-night-storm", "Tokyo night storm").addOption("catppuccin-mocha", "Catppuccin mocha").addOption("catppuccin-latte", "Catppuccin latte").addOption("nord", "Nord").addOption("nord-light", "Nord light").addOption("dracula", "Dracula").addOption("github-dark", "GitHub dark").addOption("github-light", "GitHub light").addOption("solarized-dark", "Solarized dark").addOption("solarized-light", "Solarized light").addOption("one-dark", "One dark").addOption("zinc-dark", "Zinc dark").addOption("zinc-light", "Zinc light").setValue(this.plugin.settings.theme).onChange(async (value) => {
       this.plugin.settings.theme = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("About").setDesc("Beautiful Mermaid uses lukilabs/beautiful-mermaid to render beautiful diagrams with enhanced aesthetics and 15+ built-in themes.").setHeading();
-    new import_obsidian.Setting(containerEl).setName("Reload Required").setDesc("After changing settings, reload note for changes to take effect.").setClass("mod-warning");
+    new import_obsidian.Setting(containerEl).setName("About").setDesc("Render diagrams with enhanced aesthetics and more than 15 built-in themes.").setHeading();
+    new import_obsidian.Setting(containerEl).setName("Reload required").setDesc("After changing settings, reload note for changes to take effect.").setClass("mod-warning");
   }
 };

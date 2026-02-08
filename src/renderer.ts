@@ -11,6 +11,34 @@ interface BeautifulMermaidTheme {
     border?: string;
 }
 
+type MermaidInitializeConfig = Record<string, unknown>;
+type MermaidRenderResult = { svg: string };
+
+type MermaidApi = {
+    initialize: (config: MermaidInitializeConfig) => void | Promise<void>;
+    render: (id: string, source: string) => Promise<MermaidRenderResult>;
+};
+
+type BeautifulMermaidApi = {
+    renderMermaid: (source: string, theme: BeautifulMermaidTheme) => Promise<string>;
+};
+
+function clearElement(element: HTMLElement): void {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
+
+function getGlobalProperty(name: string): unknown {
+    return (window as unknown as Record<string, unknown>)[name];
+}
+
+function hasFunctionProperty(value: unknown, prop: string): value is Record<string, (...args: never[]) => unknown> {
+    if (typeof value !== "object" || value === null) return false;
+    const record = value as Record<string, unknown>;
+    return typeof record[prop] === "function";
+}
+
 // Theme definitions from beautiful-mermaid
 const THEMES: Record<string, BeautifulMermaidTheme> = {
     'tokyo-night': { bg: '#1a1b26', fg: '#a9b1d6', accent: '#7aa2f7' },
@@ -35,11 +63,11 @@ function applyThemeToSvg(svgElement: SVGElement, theme: BeautifulMermaidTheme): 
     svgElement.style.setProperty('--bg', theme.bg);
     svgElement.style.setProperty('--fg', theme.fg);
 
-    if (theme.line) svgElement.style.setProperty('--line', theme.line);
-    if (theme.accent) svgElement.style.setProperty('--accent', theme.accent);
-    if (theme.muted) svgElement.style.setProperty('--muted', theme.muted);
-    if (theme.surface) svgElement.style.setProperty('--surface', theme.surface);
-    if (theme.border) svgElement.style.setProperty('--border', theme.border);
+    svgElement.style.setProperty('--line', theme.line || mixColor(theme.bg, theme.fg, 0.3));
+    svgElement.style.setProperty('--accent', theme.accent || mixColor(theme.bg, theme.fg, 0.5));
+    svgElement.style.setProperty('--muted', theme.muted || mixColor(theme.bg, theme.fg, 0.6));
+    svgElement.style.setProperty('--surface', theme.surface || mixColor(theme.bg, theme.fg, 0.03));
+    svgElement.style.setProperty('--border', theme.border || mixColor(theme.bg, theme.fg, 0.2));
 
     // Set background color
     svgElement.style.backgroundColor = theme.bg;
@@ -88,60 +116,27 @@ export async function renderBeautifulMermaid(
     const theme = THEMES[themeName] || THEMES['tokyo-night'];
 
     // Clear container
-    container.innerHTML = '';
+    clearElement(container);
 
     // Check if beautiful-mermaid is available
-    if ((window as any).beautifulMermaid) {
+    const beautifulMermaidCandidate = getGlobalProperty("beautifulMermaid");
+    if (hasFunctionProperty(beautifulMermaidCandidate, "renderMermaid")) {
         try {
             // Use beautiful-mermaid if available via CDN
-            const beautifulMermaid = (window as any).beautifulMermaid;
+            const beautifulMermaid = beautifulMermaidCandidate as BeautifulMermaidApi;
             const svg = await beautifulMermaid.renderMermaid(source, theme);
 
             // Parse SVG string and apply theme
             const parser = new DOMParser();
             const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
-            const rootElement = svgDoc.documentElement;
+            const svgElement = svgDoc.querySelector("svg");
+            if (!svgElement) throw new Error("Failed to parse SVG from beautiful-mermaid");
 
-            // Verify it's an SVG element before casting
-            if (rootElement && rootElement.tagName.toLowerCase() === 'svg') {
-                const svgElement = rootElement as unknown as SVGElement;
-                applyThemeToSvg(svgElement, theme);
+            applyThemeToSvg(svgElement, theme);
+            container.appendChild(svgElement);
+            svgElement.classList.add("beautiful-mermaid-svg");
 
-                // Add CSS for theme variables
-                const style = document.createElement('style');
-                style.textContent = `
-                    .beautiful-mermaid-svg {
-                        --bg: ${theme.bg};
-                        --fg: ${theme.fg};
-                        --line: ${theme.line || mixColor(theme.bg, theme.fg, 0.3)};
-                        --accent: ${theme.accent || mixColor(theme.bg, theme.fg, 0.5)};
-                        --muted: ${theme.muted || mixColor(theme.bg, theme.fg, 0.6)};
-                        --surface: ${theme.surface || mixColor(theme.bg, theme.fg, 0.03)};
-                        --border: ${theme.border || mixColor(theme.bg, theme.fg, 0.2)};
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                    }
-                    .beautiful-mermaid-svg text {
-                        fill: var(--fg);
-                    }
-                    .beautiful-mermaid-svg path,
-                    .beautiful-mermaid-svg line,
-                    .beautiful-mermaid-svg rect,
-                    .beautiful-mermaid-svg circle {
-                        stroke: var(--line);
-                    }
-                    .beautiful-mermaid-svg .node rect {
-                        fill: var(--surface);
-                        stroke: var(--border);
-                    }
-                `;
-
-                container.appendChild(style);
-                container.appendChild(svgElement);
-                svgElement.classList.add('beautiful-mermaid-svg');
-
-                return;
-            }
-            throw new Error('Failed to parse SVG from beautiful-mermaid');
+            return;
 
         } catch (error) {
             console.error('Beautiful Mermaid rendering failed:', error);
@@ -149,21 +144,17 @@ export async function renderBeautifulMermaid(
     }
 
     // Fallback: Try to use mermaid.js directly with theme
-    if ((window as any).mermaid) {
+    const mermaidCandidate = getGlobalProperty("mermaid");
+    if (hasFunctionProperty(mermaidCandidate, "initialize") && hasFunctionProperty(mermaidCandidate, "render")) {
         try {
             // Clean the source
             const cleanSource = source.trim();
 
             // Generate unique ID
-            const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
-
-            // Create temporary div
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<pre class="mermaid">${cleanSource}</pre>`;
-            container.appendChild(tempDiv);
+            const id = "mermaid-" + Math.random().toString(36).slice(2, 11);
 
             // Initialize mermaid with theme
-            const mermaid = (window as any).mermaid;
+            const mermaid = mermaidCandidate as MermaidApi;
 
             // Map theme name to mermaid theme
             const mermaidTheme = themeName.includes('light') ? 'default' : 'dark';
@@ -176,14 +167,15 @@ export async function renderBeautifulMermaid(
 
             // Render the diagram
             const { svg } = await mermaid.render(id, cleanSource);
-            container.innerHTML = svg;
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svg, "image/svg+xml");
+            const svgElement = svgDoc.querySelector("svg");
+            if (!svgElement) throw new Error("Failed to parse SVG from mermaid");
+            container.appendChild(svgElement);
 
             // Apply our beautiful theme
-            const svgElement = container.querySelector('svg');
-            if (svgElement && svgElement.tagName === 'svg') {
-                applyThemeToSvg(svgElement as SVGElement, theme);
-                svgElement.classList.add('beautiful-mermaid-svg');
-            }
+            applyThemeToSvg(svgElement, theme);
+            svgElement.classList.add("beautiful-mermaid-svg");
 
             return;
         } catch (error) {
@@ -192,20 +184,30 @@ export async function renderBeautifulMermaid(
     }
 
     // If neither is available, show message
-    container.innerHTML = `
-        <div style="padding: 20px; text-align: center; color: ${theme.fg}; background: ${theme.bg}; border-radius: 8px;">
-            <p>⚠️ Beautiful Mermaid plugin requires mermaid.js to be loaded.</p>
-            <p>Enable Obsidian's built-in Mermaid plugin in settings, or install via CDN.</p>
-        </div>
-    `;
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("beautiful-mermaid-missing");
+    wrapper.style.setProperty("--bg", theme.bg);
+    wrapper.style.setProperty("--fg", theme.fg);
+    wrapper.style.setProperty("--border", theme.border || mixColor(theme.bg, theme.fg, 0.2));
+
+    const p1 = document.createElement("p");
+    p1.textContent = "Beautiful Mermaid plugin requires Mermaid to be enabled.";
+
+    const p2 = document.createElement("p");
+    p2.textContent = "Enable Obsidian's built-in Mermaid plugin in settings, or load Mermaid from an online source.";
+
+    wrapper.appendChild(p1);
+    wrapper.appendChild(p2);
+    container.appendChild(wrapper);
 }
 
 /**
  * Load beautiful-mermaid from CDN
  */
-export async function loadBeautifulMermaid(): Promise<void> {
+export function loadBeautifulMermaid(): void {
     // Check if already loaded
-    if ((window as any).beautifulMermaid) {
+    const beautifulMermaidCandidate = getGlobalProperty("beautifulMermaid");
+    if (beautifulMermaidCandidate !== undefined) {
         return;
     }
 
@@ -213,7 +215,7 @@ export async function loadBeautifulMermaid(): Promise<void> {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/beautiful-mermaid/dist/beautiful-mermaid.browser.global.js';
     script.onload = () => {
-        console.log('Beautiful Mermaid loaded successfully');
+        console.debug('Beautiful Mermaid loaded successfully');
     };
     script.onerror = () => {
         console.error('Failed to load Beautiful Mermaid from CDN');

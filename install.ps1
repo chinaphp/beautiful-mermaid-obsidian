@@ -21,6 +21,9 @@ New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null
 Write-Host "📦 Copying plugin files..." -ForegroundColor Green
 Copy-Item -Path "manifest.json" -Destination "$pluginDir\manifest.json" -Force
 Copy-Item -Path "main.js" -Destination "$pluginDir\main.js" -Force
+if (Test-Path "styles.css") {
+    Copy-Item -Path "styles.css" -Destination "$pluginDir\styles.css" -Force
+}
 
 # Copy additional files if they exist
 if (Test-Path "assets") {

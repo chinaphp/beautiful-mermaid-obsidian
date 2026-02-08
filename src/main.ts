@@ -30,7 +30,10 @@ export default class BeautifulMermaidPlugin extends Plugin {
                     await renderBeautifulMermaid(source, el, this.settings.theme);
                 } catch (error) {
                     console.error('Beautiful Mermaid error:', error);
-                    el.innerHTML = `<div class="error">Failed to render Mermaid diagram: ${error}</div>`;
+                    const errorDiv = document.createElement("div");
+                    errorDiv.classList.add("error");
+                    errorDiv.textContent = `Failed to render Mermaid diagram: ${String(error)}`;
+                    el.appendChild(errorDiv);
                 }
             }
         );
@@ -40,7 +43,8 @@ export default class BeautifulMermaidPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const loaded = (await this.loadData()) as Partial<BeautifulMermaidSettings> | null;
+        this.settings = { ...DEFAULT_SETTINGS, ...(loaded ?? {}) };
     }
 
     async saveSettings() {
@@ -61,8 +65,8 @@ class BeautifulMermaidSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Use Default Mermaid')
-            .setDesc('Disable Beautiful Mermaid and use Obsidian\'s built-in Mermaid renderer')
+            .setName('Use default Mermaid')
+            .setDesc('Disable beautiful Mermaid and use Obsidian\'s built-in Mermaid renderer.')
             .addToggle((toggle: import('obsidian').ToggleComponent) => toggle
                 .setValue(this.plugin.settings.useDefaultMermaid)
                 .onChange(async (value: boolean) => {
@@ -72,22 +76,22 @@ class BeautifulMermaidSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Theme')
-            .setDesc('Select a theme for Beautiful Mermaid diagrams')
+            .setDesc('Select a theme for beautiful Mermaid diagrams.')
             .addDropdown((dropdown: import('obsidian').DropdownComponent) => dropdown
-                .addOption('tokyo-night', 'Tokyo Night')
-                .addOption('tokyo-night-storm', 'Tokyo Night Storm')
-                .addOption('catppuccin-mocha', 'Catppuccin Mocha')
-                .addOption('catppuccin-latte', 'Catppuccin Latte')
+                .addOption('tokyo-night', 'Tokyo night')
+                .addOption('tokyo-night-storm', 'Tokyo night storm')
+                .addOption('catppuccin-mocha', 'Catppuccin mocha')
+                .addOption('catppuccin-latte', 'Catppuccin latte')
                 .addOption('nord', 'Nord')
-                .addOption('nord-light', 'Nord Light')
+                .addOption('nord-light', 'Nord light')
                 .addOption('dracula', 'Dracula')
-                .addOption('github-dark', 'GitHub Dark')
-                .addOption('github-light', 'GitHub Light')
-                .addOption('solarized-dark', 'Solarized Dark')
-                .addOption('solarized-light', 'Solarized Light')
-                .addOption('one-dark', 'One Dark')
-                .addOption('zinc-dark', 'Zinc Dark')
-                .addOption('zinc-light', 'Zinc Light')
+                .addOption('github-dark', 'GitHub dark')
+                .addOption('github-light', 'GitHub light')
+                .addOption('solarized-dark', 'Solarized dark')
+                .addOption('solarized-light', 'Solarized light')
+                .addOption('one-dark', 'One dark')
+                .addOption('zinc-dark', 'Zinc dark')
+                .addOption('zinc-light', 'Zinc light')
                 .setValue(this.plugin.settings.theme)
                 .onChange(async (value: string) => {
                     this.plugin.settings.theme = value;
@@ -96,11 +100,11 @@ class BeautifulMermaidSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('About')
-            .setDesc('Beautiful Mermaid uses lukilabs/beautiful-mermaid to render beautiful diagrams with enhanced aesthetics and 15+ built-in themes.')
+            .setDesc('Render diagrams with enhanced aesthetics and more than 15 built-in themes.')
             .setHeading();
 
         new Setting(containerEl)
-            .setName('Reload Required')
+            .setName('Reload required')
             .setDesc('After changing settings, reload note for changes to take effect.')
             .setClass('mod-warning');
     }

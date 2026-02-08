@@ -23,6 +23,9 @@ mkdir -p "$PLUGIN_DIR"
 echo "📦 Copying plugin files..."
 cp manifest.json "$PLUGIN_DIR/"
 cp main.js "$PLUGIN_DIR/"
+if [ -f "styles.css" ]; then
+    cp styles.css "$PLUGIN_DIR/"
+fi
 
 # Copy additional files if they exist
 if [ -d "assets" ]; then

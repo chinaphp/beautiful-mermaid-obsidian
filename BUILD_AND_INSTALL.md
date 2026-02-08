@@ -39,7 +39,7 @@ cd beautiful-mermaid-obsidian
 
 3. **复制插件文件**
    ```bash
-   cp manifest.json main.js ~/.config/obsidian/plugins/beautiful-mermaid/
+   cp manifest.json main.js styles.css ~/.config/obsidian/plugins/beautiful-mermaid/
    ```
 
 4. **在 Obsidian 中启用**
