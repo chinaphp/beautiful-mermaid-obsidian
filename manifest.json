@@ -1,7 +1,7 @@
 {
   "id": "beautiful-mermaid",
   "name": "Beautiful Mermaid",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "minAppVersion": "0.15.0",
   "description": "Beautiful Mermaid diagrams using lukilabs/beautiful-mermaid with 15+ built-in themes and enhanced aesthetics.",
   "author": "Coffee",

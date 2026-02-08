@@ -1,6 +1,6 @@
 {
   "name": "beautiful-mermaid-obsidian",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Beautiful Mermaid diagrams using lukilabs/beautiful-mermaid with 15+ built-in themes and enhanced aesthetics.",
   "main": "main.js",
   "scripts": {

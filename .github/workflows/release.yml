@@ -30,7 +30,7 @@ jobs:
       - name: Create plugin archive
         run: |
           mkdir -p release
-          cp manifest.json main.js release/
+          cp manifest.json main.js styles.css release/
           cd release
           zip -r ../beautiful-mermaid-${{ github.ref_name }}.zip *
           cd ..
@@ -57,6 +57,7 @@ jobs:
             beautiful-mermaid-${{ github.ref_name }}.zip
             manifest.json
             main.js
+            styles.css
           draft: false
           prerelease: false
         env:
