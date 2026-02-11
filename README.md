@@ -1,8 +1,11 @@
 # Beautiful Mermaid for Obsidian
 
+[![Release](https://img.shields.io/github/v/release/chinaphp/beautiful-mermaid-obsidian?display_name=tag&style=flat-square)](https://github.com/chinaphp/beautiful-mermaid-obsidian/releases)
+[![License](https://img.shields.io/github/license/chinaphp/beautiful-mermaid-obsidian?style=flat-square)](LICENSE)
+
 Beautiful Mermaid rendering plugin for Obsidian using [lukilabs/beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid).
 
-## Features
+## ✨ Features
 
 - 🎨 **15+ Beautiful Themes** - Tokyo Night, Catppuccin, Nord, Dracula, and more
 - ✨ **Enhanced Aesthetics** - Professional-looking diagrams with better colors and styling
@@ -10,36 +13,58 @@ Beautiful Mermaid rendering plugin for Obsidian using [lukilabs/beautiful-mermai
 - 🎯 **Seamless Integration** - Works with existing Mermaid code blocks
 - ⚡ **Fast Rendering** - Optimized for performance
 
-## Installation
+## 📦 Installation
 
-### From Source
+### Method 1: BRAT Plugin (Recommended)
 
-1. Clone this repository
-2. Run `bun install`
-3. Run `bun run build`
-4. Copy the built files to your Obsidian vault's plugins directory:
+1. Install the [BRAT (Beta Tester's Auto-update Tool)](https://github.com/TfTHacker/obsidian42-brat) plugin from Community Plugins
+2. Open BRAT settings
+3. Click "Add a beta plugin"
+4. Enter the repository URL:
    ```
-   mkdir -p ~/.obsidian/plugins/beautiful-mermaid
-   cp manifest.json main.js styles.css ~/.obsidian/plugins/beautiful-mermaid/
+   https://github.com/chinaphp/beautiful-mermaid-obsidian
    ```
-5. Enable the plugin in Obsidian settings
+5. Click "Add Plugin"
+6. Enable "Beautiful Mermaid" in Community Plugins
 
-### From Community Plugins (Coming Soon)
+### Method 2: Manual Installation
 
-Once published, you can install directly from Obsidian's community plugin browser.
+1. Download the latest release from [GitHub Releases](https://github.com/chinaphp/beautiful-mermaid-obsidian/releases/latest)
+2. Extract the files to your Obsidian vault's `.obsidian/plugins/beautiful-mermaid/` directory
+3. Enable the plugin in Obsidian settings
 
-## Usage
+### Method 3: From Source
+
+```bash
+# Clone this repository
+git clone https://github.com/chinaphp/beautiful-mermaid-obsidian.git
+cd beautiful-mermaid-obsidian
+
+# Install dependencies
+bun install
+
+# Build the plugin
+bun run build
+
+# Copy files to your vault
+mkdir -p ~/.obsidian/plugins/beautiful-mermaid
+cp manifest.json main.js styles.css ~/.obsidian/plugins/beautiful-mermaid/
+
+# Enable the plugin in Obsidian settings
+```
+
+## 🚀 Usage
 
 ### Basic Usage
 
 Just use Mermaid code blocks as usual:
 
-\`\`\`mermaid
+````mermaid
 graph TD
     A[Start] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[End]
-\`\`\`
+````
 
 The plugin will automatically render it with the selected theme.
 
@@ -49,7 +74,7 @@ The plugin will automatically render it with the selected theme.
 2. Select a theme from the dropdown
 3. Reload your note to see the changes
 
-## Available Themes
+## 🎨 Available Themes
 
 | Theme | Type | Preview |
 |-------|------|---------|
@@ -68,7 +93,7 @@ The plugin will automatically render it with the selected theme.
 | Zinc Dark | Dark | Monochromatic |
 | Zinc Light | Light | Monochromatic |
 
-## Development
+## 🔧 Development
 
 This project uses [Bun](https://bun.sh/) as the package manager and build tool.
 
@@ -86,7 +111,7 @@ bun run build
 bun run type-check
 ```
 
-## Releasing
+## 🚢 Releasing
 
 This project uses GitHub Actions to automatically build and create releases when pushing version tags.
 
@@ -113,24 +138,24 @@ The workflow will:
 3. Create a GitHub Release with a ZIP package
 4. Upload all necessary files
 
-## Dependencies
+## 📚 Dependencies
 
 - [beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) - Core rendering library
 - [Obsidian Plugin API](https://github.com/obsidianmd/obsidian-api) - Plugin framework
 
-## License
+## 📄 License
 
 MIT
 
-## Credits
+## 🙏 Credits
 
 - [lukilabs/beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) - Beautiful Mermaid rendering
 - [Obsidian](https://obsidian.md/) - The note-taking app
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Support
+## 💬 Support
 
 If you encounter any issues, please report them on the [GitHub Issues](https://github.com/chinaphp/beautiful-mermaid-obsidian/issues) page.
