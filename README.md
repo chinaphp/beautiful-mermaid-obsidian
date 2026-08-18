@@ -1,3 +1,5 @@
+
+
 # Beautiful Mermaid for Obsidian
 
 [![Release](https://img.shields.io/github/v/release/chinaphp/beautiful-mermaid-obsidian?display_name=tag&style=flat-square)](https://github.com/chinaphp/beautiful-mermaid-obsidian/releases)
@@ -47,8 +49,8 @@ bun install
 bun run build
 
 # Copy files to your vault
-mkdir -p ~/.obsidian/plugins/beautiful-mermaid
-cp manifest.json main.js styles.css ~/.obsidian/plugins/beautiful-mermaid/
+mkdir -p /path/to/your-vault/.obsidian/plugins/beautiful-mermaid
+cp manifest.json main.js styles.css /path/to/your-vault/.obsidian/plugins/beautiful-mermaid/
 
 # Enable the plugin in Obsidian settings
 ```
